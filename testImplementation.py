@@ -1,3 +1,6 @@
+#Hamza Imran Mirza
+#Project for Ensemble AI Internship.
+
 import torch
 from ndlinear import NdLinear
 import torch.nn as nn
