@@ -10,6 +10,7 @@ from torchvision import datasets, transforms, models
 from torch.utils.data import DataLoader
 import numpy as np
 from tqdm import tqdm
+import time
 
 #Since, we already have imported the NdLinear module, we do not have to define it in the code. 
 
@@ -112,6 +113,14 @@ class SimCLRAugmentation:
 
     def __call__(self, x):
         return self.base_transform(x), self.base_transform(x)
+
+
+#Decided to add parameter counter inorder to better benchmark the models.
+#The initial run used only Loss function to benchmark the models, but I thought it would be better to add the parameter counter as well.
+#As then I will be able to see if NdLinear Layers uses lesser parameters than the standard nn.Linear layers.
+#This will help me to see if NdLinear layers are more efficient than the standard nn.Linear layers.
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
         
 
 if __name__ == '__main__':
@@ -184,7 +193,9 @@ if __name__ == '__main__':
     criterion = NTXtentLoss(temperature=0.5)
 
 
-
+    #Printing out the parameter count for both models.
+    print("Baseline model parameters:", count_parameters(baseline_model))
+    print("NdLinear model parameters:", count_parameters(NdLinear_model))
 
 
 
@@ -219,6 +230,16 @@ if __name__ == '__main__':
     num_epochs = 5
     for epoch in range(1, num_epochs + 1):
         print(f"\nEpoch {epoch}/{num_epochs}")
+        
+        # Time the baseline model
+        start_time = time.time()
         loss_baseline = train_epoch(baseline_model, optimizer_baseline, train_loader, criterion, device)
+        baseline_epoch_time = time.time() - start_time
+        
+        # Time the NdLinear model
+        start_time = time.time()
         loss_nd = train_epoch(NdLinear_model, optimizer_NdLinear, train_loader, criterion, device)
-        print(f"Epoch {epoch} - Baseline Loss: {loss_baseline:.4f}, NdLinear Loss: {loss_nd:.4f}")
+        ndlinear_epoch_time = time.time() - start_time
+        
+        print(f"Epoch {epoch} - Baseline Loss: {loss_baseline:.4f} (Time: {baseline_epoch_time:.2f}s), "
+              f"NdLinear Loss: {loss_nd:.4f} (Time: {ndlinear_epoch_time:.2f}s)")
