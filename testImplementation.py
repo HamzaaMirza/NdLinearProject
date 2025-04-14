@@ -163,6 +163,9 @@ if __name__ == '__main__':
     hidden_dim = 256
     out_dim = 128
 
+    #Now inorder to benchmark NdLinear's ability to use less parameters than the standard nn.Linear layers,
+    # I will use reduced hidden dimenstions for Nd Projection Head
+    reduced_hidden_dim = hidden_dim // 2  #For this example, I will be using 128 instead of 256
 
     #Now we will create two instances of the projection head, one with the baseline nn.Linear layers and the other with NdLinear layers.
 
@@ -170,7 +173,7 @@ if __name__ == '__main__':
     baseline_head = ProjectionHead(in_dim, hidden_dim, out_dim)
 
     #The head using NdLinear layers is:
-    nd_head = NdProjectionHead(in_dim, hidden_dim, out_dim)
+    nd_head = NdProjectionHead(in_dim, reduced_hidden_dim, out_dim)
 
 
     #Similarly, I will build two SimCLR models, each with one of the projection heads.
@@ -243,3 +246,4 @@ if __name__ == '__main__':
         
         print(f"Epoch {epoch} - Baseline Loss: {loss_baseline:.4f} (Time: {baseline_epoch_time:.2f}s), "
               f"NdLinear Loss: {loss_nd:.4f} (Time: {ndlinear_epoch_time:.2f}s)")
+        
