@@ -18,3 +18,7 @@ This is a submission for the internship opportunity provided by the ensemble AI.
 Moreover, this project helped me in improving my PyTorch skills and gave me an in depth understanding of NdLayers model. 
 I hope you will consider my application and I will be happy to understand more and work more on this with Ensemble AI
 Thank You Very Much!
+
+
+
+The screenshots provide three test runs of the code and along with the outputs and finally I provided with train loss curves and train time curves. 
