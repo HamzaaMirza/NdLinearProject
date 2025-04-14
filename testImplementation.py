@@ -200,7 +200,11 @@ if __name__ == '__main__':
     print("Baseline model parameters:", count_parameters(baseline_model))
     print("NdLinear model parameters:", count_parameters(NdLinear_model))
 
-
+    # Lists to record losses and epoch times.
+    losses_baseline = []
+    losses_nd = []
+    times_baseline = []
+    times_nd = []
 
     #Finally, we can go ahead and define the taining loop
     def train_epoch(model, optimizer, data_loader, criterion, device):
@@ -230,7 +234,7 @@ if __name__ == '__main__':
         return avg_loss
 
     # Main training loop that prints epoch information.
-    num_epochs = 5
+    num_epochs = 10
     for epoch in range(1, num_epochs + 1):
         print(f"\nEpoch {epoch}/{num_epochs}")
         
@@ -247,3 +251,51 @@ if __name__ == '__main__':
         print(f"Epoch {epoch} - Baseline Loss: {loss_baseline:.4f} (Time: {baseline_epoch_time:.2f}s), "
               f"NdLinear Loss: {loss_nd:.4f} (Time: {ndlinear_epoch_time:.2f}s)")
         
+
+        losses_baseline.append(loss_baseline)
+        losses_nd.append(loss_nd)
+        times_baseline.append(baseline_epoch_time)
+        times_nd.append(ndlinear_epoch_time)
+        
+
+    #Now we will Compute the epoch at which each model reaches a given convergence threshold.
+    convergence_threshold = 3.5  # Set an example threshold for NT-Xent loss.
+    baseline_convergence_epoch = None
+    nd_convergence_epoch = None
+    for i in range(len(losses_baseline)):
+        if baseline_convergence_epoch is None and losses_baseline[i] < convergence_threshold:
+            baseline_convergence_epoch = i + 1
+        if nd_convergence_epoch is None and losses_nd[i] < convergence_threshold:
+            nd_convergence_epoch = i + 1
+    
+    print("\nConvergence Summary:")
+    print("Baseline model converged at epoch:", baseline_convergence_epoch if baseline_convergence_epoch is not None else "Not reached")
+    print("NdLinear model converged at epoch:", nd_convergence_epoch if nd_convergence_epoch is not None else "Not reached")
+    
+
+
+    #Now we will plot the graphs:
+    import matplotlib.pyplot as plt
+
+    #Plotting the training loss curves for both models
+    plt.figure(figsize=(8, 6))
+    plt.plot(range(1, num_epochs + 1), losses_baseline, label="Baseline Model")
+    plt.plot(range(1,  num_epochs + 1), losses_nd, label="NdLinear Model")
+    plt.xlabel("Epoch")
+    plt.ylabel("Average NT-Xent Loss")
+    plt.title("Convergence Comparison")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+
+    #Plotting the epoch times for both modekls.
+    plt.figure(figsize=(8, 6))
+    plt.plot(range(1, num_epochs + 1), times_baseline, label="Baseline Time per Epoch")
+    plt.plot(range(1, num_epochs + 1), times_nd, label="NdLinear Time per Epoch")
+    plt.xlabel("Epoch")
+    plt.ylabel("Time (s)")
+    plt.title("Epoch Training Time Comparison")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
